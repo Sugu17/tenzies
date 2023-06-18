@@ -2,6 +2,8 @@ import "/src/App.css";
 import Dice from "./Components/Dice";
 import { useEffect, useState } from "react";
 import { nanoid } from "nanoid";
+import Confetti from "react-confetti";
+import useWindowSize from "react-use/lib/useWindowSize";
 
 export default function App() {
   const [dices, setDices] = useState<Array<object>>(() => generateNewDices());
@@ -31,15 +33,20 @@ export default function App() {
   }
 
   function rollDice() {
-    setDices((prevDices) => {
-      const newDices = prevDices.map((prevDice) => {
-        if (prevDice.isHeld != true) {
-          return { ...prevDice, value: getRandomNumber() };
-        }
-        return prevDice;
+    if (tenzies) {
+      setTenzies(false);
+      setDices(generateNewDices());
+    } else {
+      setDices((prevDices) => {
+        const newDices = prevDices.map((prevDice) => {
+          if (prevDice.isHeld != true) {
+            return { ...prevDice, value: getRandomNumber() };
+          }
+          return prevDice; 
+        });
+        return newDices;
       });
-      return newDices;
-    });
+    }
   }
 
   function holdDice(diceId) {
@@ -61,8 +68,10 @@ export default function App() {
     />
   ));
 
+  const { width, height } = useWindowSize();
   return (
     <main className="tenzie-container">
+      {tenzies && <Confetti width={width} height={height} />}
       <h1 className="tenzie__header">Tenzies</h1>
       <p className="tenzie__content">
         Roll until all dice are the same. Click each die to freeze it at its
@@ -70,7 +79,7 @@ export default function App() {
       </p>
       <div className="dice-grid">{diceGrid}</div>
       <div className="button roll-button" onClick={rollDice}>
-        Roll
+        {tenzies ? "New Game" : "Roll"}
       </div>
     </main>
   );
