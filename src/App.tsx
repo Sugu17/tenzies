@@ -30,7 +30,6 @@ export default function App() {
     const firstValue = dices[0].value;
     const allSameValue = dices.every((dice) => dice.value === firstValue);
     if (allHeld && allSameValue) {
-      console.log("Game won");
       setTenzies(true);
     }
   }, [dices]);
@@ -97,10 +96,11 @@ export default function App() {
           Time &nbsp;{`${GameMinutes} : ${GameSeconds}`}
         </span>
       </div>
-      <h1 className="tenzie__header">Tenzies</h1>
+      <h1 className="tenzie__header">{tenzies ? "You Won !" : "Tenzies"}</h1>
       <p className="tenzie__content">
-        Roll until all dice are the same. Click each die to freeze it at its
-        current value between rolls.
+        {tenzies
+          ? "Thank you for absolutely wasting your time\n#Respect +99"
+          : "Roll until all dice are the same. Click each die to freeze it at its current value between rolls."}
       </p>
       <div className="dice-grid">{diceGrid}</div>
       <div className="button roll-button" onClick={rollDice}>
