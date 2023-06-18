@@ -3,7 +3,7 @@ export default function Dice(props) {
 
   return (
     <div className={className} onClick={props.holdDice}>
-      <span>{props.diceValue}</span>
+      <span className="no_selection">{props.diceValue}</span>
     </div>
   );
 }

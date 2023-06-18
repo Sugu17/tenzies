@@ -10,6 +10,21 @@ export default function App() {
 
   const [tenzies, setTenzies] = useState<boolean>(false);
 
+  const [rolls, setRolls] = useState(0);
+
+  const [gameTime, setGameTime] = useState(1);
+
+  useEffect(() => {
+    if (!tenzies) {
+      const timerId = setInterval(
+        () => setGameTime((prevGameTime) => prevGameTime + 1),
+        1000
+      );
+      //Cleanup
+      return () => clearTimeout(timerId);
+    }
+  });
+
   useEffect(() => {
     const allHeld = dices.every((dice) => dice.isHeld);
     const firstValue = dices[0].value;
@@ -35,14 +50,16 @@ export default function App() {
   function rollDice() {
     if (tenzies) {
       setTenzies(false);
+      setRolls(0);
       setDices(generateNewDices());
     } else {
+      setRolls((prevRolls) => prevRolls + 1);
       setDices((prevDices) => {
         const newDices = prevDices.map((prevDice) => {
           if (prevDice.isHeld != true) {
             return { ...prevDice, value: getRandomNumber() };
           }
-          return prevDice; 
+          return prevDice;
         });
         return newDices;
       });
@@ -69,9 +86,17 @@ export default function App() {
   ));
 
   const { width, height } = useWindowSize();
+  const GameMinutes = Math.floor(gameTime / 60);
+  const GameSeconds = gameTime % 60;
   return (
     <main className="tenzie-container">
       {tenzies && <Confetti width={width} height={height} />}
+      <div className="game-info">
+        <span className="game-rolls">{rolls}</span>
+        <span className="game-time">
+          Time &nbsp;{`${GameMinutes} : ${GameSeconds}`}
+        </span>
+      </div>
       <h1 className="tenzie__header">Tenzies</h1>
       <p className="tenzie__content">
         Roll until all dice are the same. Click each die to freeze it at its
@@ -79,7 +104,7 @@ export default function App() {
       </p>
       <div className="dice-grid">{diceGrid}</div>
       <div className="button roll-button" onClick={rollDice}>
-        {tenzies ? "New Game" : "Roll"}
+        <span className="no_selection">{tenzies ? "New Game" : "Roll"}</span>
       </div>
     </main>
   );
