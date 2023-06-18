@@ -1,30 +1,59 @@
 import "/src/App.css";
 import Dice from "./Components/Dice";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { nanoid } from "nanoid";
 
-export default function App() {
-  const [dices, setdices] = useState<Array<object>>(()=>generateNewDices());
 
-  console.log(dices);
+export default function App() {
+  const [dices, setDices] = useState<Array<object>>(() => generateNewDices());
+
+  const [tenzies,setTenzies]=useState<boolean>(false);
+
+  useEffect(()=>{
+    console.log("Dice changed!");
+  },[dices])
 
   function generateNewDices() {
-    const min = Math.ceil(1);
-    const max = Math.ceil(6);
     const newDices = [];
     for (let i = 0; i < 10; ++i) {
-      const randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
-      newDices.push({ value: randomNum, isHeld: false, id: nanoid() });
+      newDices.push({ value: getRandomNumber(), isHeld: false, id: nanoid() });
     }
     return newDices;
   }
 
+  function getRandomNumber(){
+    return (Math.floor(Math.random() * 6) + 1);
+  }
+
   function rollDice() {
-    setdices(generateNewDices());
+    setDices((prevDices) => {
+      const newDices = prevDices.map((prevDice) => {
+        if (prevDice.isHeld != true) {
+          return { ...prevDice, value: getRandomNumber() };
+        }
+        return prevDice;
+      });
+      return newDices;
+    });
+  }
+
+  function holdDice(diceId) {
+    setDices((prevDices) => {
+      const newDices = prevDices.map((dice) => {
+        if (dice.id === diceId) return { ...dice, isHeld: !dice.isHeld };
+        return dice;
+      });
+      return newDices;
+    });
   }
 
   const diceGrid = dices.map((diceObj) => (
-    <Dice diceId={diceObj.value} key={diceObj.id}/>
+    <Dice
+      diceValue={diceObj.value}
+      isHeld={diceObj.isHeld}
+      holdDice={() => holdDice(diceObj.id)}
+      key={diceObj.id}
+    />
   ));
 
   return (
