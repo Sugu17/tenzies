@@ -3,15 +3,20 @@ import Dice from "./Components/Dice";
 import { useEffect, useState } from "react";
 import { nanoid } from "nanoid";
 
-
 export default function App() {
   const [dices, setDices] = useState<Array<object>>(() => generateNewDices());
 
-  const [tenzies,setTenzies]=useState<boolean>(false);
+  const [tenzies, setTenzies] = useState<boolean>(false);
 
-  useEffect(()=>{
-    console.log("Dice changed!");
-  },[dices])
+  useEffect(() => {
+    const allHeld = dices.every((dice) => dice.isHeld);
+    const firstValue = dices[0].value;
+    const allSameValue = dices.every((dice) => dice.value === firstValue);
+    if (allHeld && allSameValue) {
+      console.log("Game won");
+      setTenzies(true);
+    }
+  }, [dices]);
 
   function generateNewDices() {
     const newDices = [];
@@ -21,8 +26,8 @@ export default function App() {
     return newDices;
   }
 
-  function getRandomNumber(){
-    return (Math.floor(Math.random() * 6) + 1);
+  function getRandomNumber() {
+    return Math.floor(Math.random() * 6) + 1;
   }
 
   function rollDice() {
